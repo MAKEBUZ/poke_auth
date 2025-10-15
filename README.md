@@ -1,4 +1,4 @@
-# poke_translate
+# poke_auth
 
 A new Flutter project.
 

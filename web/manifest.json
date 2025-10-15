@@ -1,6 +1,6 @@
 {
-    "name": "poke_translate",
-    "short_name": "poke_translate",
+    "name": "poke_auth",
+    "short_name": "poke_auth",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
