@@ -37,8 +37,8 @@ class Pokemon {
     // Extraer ataques (moves)
     final List<String> attacks = (json['moves'] as List?)
         ?.take(4) // Tomar solo los primeros 4 ataques
-        ?.map((move) => move['move']['name'].toString().replaceAll('-', ' ').capitalize())
-        ?.toList() ?? [];
+        .map((move) => move['move']['name'].toString().replaceAll('-', ' ').capitalize())
+        .toList() ?? [];
     
     // Extraer estadísticas
     final Map<String, int> stats = {};
