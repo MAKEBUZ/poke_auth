@@ -40,9 +40,7 @@ class _AuthPageState extends State<AuthPage> {
         await _client.auth.signInWithPassword(email: email, password: password);
       } else {
         await _client.auth.signUp(email: email, password: password);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registro exitoso. Revisa tu correo si requiere verificación.')),
-        );
+        // Mensaje de verificación eliminado según solicitud
       }
     } catch (e) {
       setState(() {

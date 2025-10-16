@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../controllers/team_controller.dart';
 import '../controllers/pokemon_controller.dart';
 import '../models/team_pokemon.dart';
@@ -19,6 +20,19 @@ class TeamView extends StatelessWidget {
         centerTitle: true,
         backgroundColor: Colors.red.shade400,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Cerrar sesión',
+            onPressed: () async {
+              try {
+                await Supabase.instance.client.auth.signOut();
+              } catch (e) {
+                Get.snackbar('Error', 'No se pudo cerrar sesión', snackPosition: SnackPosition.BOTTOM);
+              }
+            },
+          ),
+        ],
       ),
       body: Container(
         decoration: BoxDecoration(

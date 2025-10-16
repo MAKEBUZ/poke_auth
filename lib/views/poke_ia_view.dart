@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import '../controllers/team_controller.dart';
@@ -133,6 +134,20 @@ class _PokeIAViewState extends State<PokeIAView> {
       appBar: AppBar(
         title: const Text('POKE-IA'),
         backgroundColor: Colors.red.shade400,
+        foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Cerrar sesión',
+            onPressed: () async {
+              try {
+                await Supabase.instance.client.auth.signOut();
+              } catch (e) {
+                Get.snackbar('Error', 'No se pudo cerrar sesión', snackPosition: SnackPosition.BOTTOM);
+              }
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [

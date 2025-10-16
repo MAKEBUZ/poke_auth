@@ -167,10 +167,7 @@ class TeamService {
 
   // Asignar equipo inicial al usuario si no tiene uno
   Future<void> ensureInitialTeamForUser({int teamSize = 6, int maxPokemonId = 151}) async {
-    final currentSize = await getTeamSize();
-    if (currentSize > 0) return;
-
-    await assignInitialTeamForUser(teamSize: teamSize, maxPokemonId: maxPokemonId);
+    return;
   }
 
   // Generar y asignar equipo inicial
