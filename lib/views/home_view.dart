@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../controllers/pokemon_controller.dart';
 import '../controllers/team_controller.dart';
 import 'pokemon_detail_view.dart';
+import 'team_view.dart';
 
 class HomeView extends StatelessWidget {
   final PokemonController controller = Get.put(PokemonController());

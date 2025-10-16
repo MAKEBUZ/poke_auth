@@ -5,8 +5,6 @@ import 'team_view.dart';
 import 'poke_ia_view.dart';
 
 class MainNavigationView extends StatefulWidget {
-  const MainNavigationView({super.key});
-
   @override
   _MainNavigationViewState createState() => _MainNavigationViewState();
 }

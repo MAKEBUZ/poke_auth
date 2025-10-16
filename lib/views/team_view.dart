@@ -409,7 +409,7 @@ class TeamView extends StatelessWidget {
               color: Colors.red.shade700,
             ),
           ),
-        )),
+        )).toList(),
         const SizedBox(height: 16),
       ],
     );
@@ -453,7 +453,7 @@ class TeamView extends StatelessWidget {
               ),
             ],
           ),
-        )),
+        )).toList(),
       ],
     );
   }
