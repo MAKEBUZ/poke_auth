@@ -1,6 +1,6 @@
 # poke_auth
 
-A new Flutter project.
+La parte del bucket, guardar conversaciones y ver el historial. No se la razon pero el boton para esto solo aparece en web y no en mi dispositivo movil.
 
 ## Getting Started
 
