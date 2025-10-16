@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import '../controllers/team_controller.dart';
 import '../models/team_pokemon.dart';
+import '../services/ai_history_service.dart';
 
 class PokeIAView extends StatefulWidget {
   const PokeIAView({super.key});
@@ -108,6 +109,14 @@ class _PokeIAViewState extends State<PokeIAView> {
       setState(() {
         _messages.add(_ChatMessage(text: text, isUser: false));
       });
+
+      // Guardar historial en Supabase Storage (bucket: historial-ia)
+      try {
+        final history = AiHistoryService();
+        await history.appendEntry(userText: prompt, assistantText: text);
+      } catch (_) {
+        // Ignorar errores de guardado para no interrumpir la experiencia de chat
+      }
     } catch (e) {
       setState(() {
         _messages.add(_ChatMessage(
@@ -136,6 +145,16 @@ class _PokeIAViewState extends State<PokeIAView> {
         backgroundColor: Colors.red.shade400,
         foregroundColor: Colors.white,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.save_alt),
+            tooltip: 'Guardar conversación',
+            onPressed: _saveCurrentConversation,
+          ),
+          IconButton(
+            icon: const Icon(Icons.history),
+            tooltip: 'Ver conversaciones',
+            onPressed: _showConversationsDialog,
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Cerrar sesión',
@@ -264,6 +283,111 @@ class _PokeIAViewState extends State<PokeIAView> {
           )
         ],
       ),
+    );
+  }
+
+  String _serializeConversation() {
+    final buffer = StringBuffer();
+    final now = DateTime.now();
+    buffer.writeln('=== Conversación POKE-IA (${now.toIso8601String()}) ===');
+    for (final m in _messages) {
+      buffer.writeln(m.isUser ? 'USER: ${m.text}' : 'POKE-IA: ${m.text}');
+    }
+    return buffer.toString();
+  }
+
+  Future<void> _saveCurrentConversation() async {
+    if (_messages.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No hay mensajes para guardar.')),
+      );
+      return;
+    }
+    try {
+      final text = _serializeConversation();
+      final service = AiHistoryService();
+      final fileName = await service.saveConversationText(text);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Conversación guardada: $fileName')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al guardar: $e')),
+      );
+    }
+  }
+
+  Future<void> _showConversationsDialog() async {
+    final service = AiHistoryService();
+    List<String> files = [];
+    try {
+      files = await service.listConversationFiles();
+    } catch (e) {
+      files = [];
+    }
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Conversaciones guardadas'),
+          content: SizedBox(
+            width: 400,
+            child: files.isEmpty
+                ? const Text('No hay conversaciones guardadas.')
+                : ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: files.length,
+                    itemBuilder: (context, index) {
+                      final name = files[index];
+                      return ListTile(
+                        leading: const Icon(Icons.description),
+                        title: Text(name),
+                        onTap: () async {
+                          Navigator.of(context).pop();
+                          await _openConversation(name);
+                        },
+                      );
+                    },
+                  ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cerrar'),
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _openConversation(String fileName) async {
+    final service = AiHistoryService();
+    String text = '';
+    try {
+      text = await service.downloadConversationText(fileName);
+    } catch (e) {
+      text = 'Error al descargar: $e';
+    }
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(fileName),
+          content: SizedBox(
+            width: 500,
+            child: SingleChildScrollView(
+              child: SelectableText(text.isEmpty ? 'Sin contenido' : text),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cerrar'),
+            )
+          ],
+        );
+      },
     );
   }
 }
